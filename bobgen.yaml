@@ -20,3 +20,7 @@ plugins:
     enabled: true
     dest: "internal/testenums"
     pkgname: "testenums"
+  factory:
+    disabled: true
+  dberrors:
+    disabled: true
