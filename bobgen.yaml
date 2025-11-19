@@ -1,0 +1,22 @@
+mysql:
+  dsn: "root:@tcp(127.0.0.1:3306)/bobo_codegen?parseTime=true"
+  concurrency: 10
+
+output: "internal/testmodels"
+pkgname: "testmodels"
+struct_tag_casing: "snake"
+no_tests: true
+
+plugins:
+  models:
+    enabled: true
+    dest: "internal/testmodels"
+    pkgname: "testmodels"
+  dbinfo:
+    enabled: true
+    dest: "internal/testdbinfo"
+    pkgname: "testdbinfo"
+  enums:
+    enabled: true
+    dest: "internal/testenums"
+    pkgname: "testenums"
