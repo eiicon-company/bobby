@@ -22,8 +22,9 @@ import (
 )
 
 var (
-	dbMain      testdb.DBTester
-	rgxMySQLkey = regexp.MustCompile(`(?m)((,\n)?\s+CONSTRAINT.*?FOREIGN KEY.*?\n)+`)
+	dbMain           testdb.DBTester
+	rgxMySQLkey      = regexp.MustCompile(`(?m)\s+CONSTRAINT\s+\S+\s+FOREIGN KEY[^\n]+\n`)
+	rgxTrailingComma = regexp.MustCompile(`,\s*\)`)
 )
 
 type (
@@ -62,6 +63,7 @@ func getSchema(filename string) ([]byte, error) {
 
 	schema = bytes.ReplaceAll(schema, []byte{'\r', '\n'}, []byte{'\n'})
 	schema = rgxMySQLkey.ReplaceAll(schema, []byte{})
+	schema = rgxTrailingComma.ReplaceAll(schema, []byte("\n)"))
 	return schema, nil
 }
 
