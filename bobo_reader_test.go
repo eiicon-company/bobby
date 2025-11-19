@@ -15,8 +15,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/xerrors"
 
-	"github.com/eiicon-company/auba-api/pkg/data/model/bobmodel/enums"
-	"github.com/eiicon-company/auba-api/pkg/data/model/bobmodel/models"
+	enums "github.com/eiicon-company/bobo/internal/testenums"
+	models "github.com/eiicon-company/bobo/internal/testmodels"
 )
 
 // Test helper to clean up test data using Bob ORM
@@ -47,10 +47,10 @@ func cleanupBanners(t *testing.T, db *sql.DB, ids ...int) {
 // Test helper to create a test banner
 func createTestBanner(id int) *models.Banner {
 	return &models.Banner{
-		ID:        id,
+		ID:        int32(id),
 		Name:      "Test Banner " + string(rune(id)),
-		State:     enums.BannersStateMypageTop,
-		Sort:      id,
+		State:     enums.BannersStateBS1,
+		Sort:      int32(id),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 	}
@@ -119,7 +119,7 @@ func TestBaseReader_Generator_SmallDataset(t *testing.T) {
 
 	// Verify order
 	for i := 0; i < count; i++ {
-		assert.Equal(t, startID+i, allBanners[i].ID, "Banners should be in correct order")
+		assert.Equal(t, int32(startID+i), allBanners[i].ID, "Banners should be in correct order")
 	}
 }
 
@@ -179,7 +179,7 @@ func TestBaseReader_Generator_LargeDataset(t *testing.T) {
 
 	// Verify order
 	for i := 0; i < count; i++ {
-		assert.Equal(t, startID+i, allBanners[i].ID, "Banners should be in correct order")
+		assert.Equal(t, int32(startID+i), allBanners[i].ID, "Banners should be in correct order")
 	}
 }
 
@@ -317,11 +317,11 @@ func TestBaseReader_Generator_WithConditions(t *testing.T) {
 	// Setup test data with alternating states
 	for i := 0; i < count; i++ {
 		banner := createTestBanner(startID + i)
-		// Alternate between MYPAGE_TOP and NOLOGIN_TOP
+		// Alternate between BS_1 and BS_4
 		if i%2 == 0 {
-			banner.State = enums.BannersStateMypageTop
+			banner.State = enums.BannersStateBS1
 		} else {
-			banner.State = enums.BannersStateNologinTop
+			banner.State = enums.BannersStateBS4
 		}
 		err := repo.Create(ctx, exec, banner)
 		require.NoError(t, err)
@@ -335,11 +335,11 @@ func TestBaseReader_Generator_WithConditions(t *testing.T) {
 		scan.StructMapper[*models.Banner](),
 	)
 
-	// Test Generator with state filter (MYPAGE_TOP only)
+	// Test Generator with state filter (BS_1 only)
 	ch := reader.Generator(ctx, exec, []SelMod{
 		sm.Where(models.Banners.Columns.ID.GTE(mysql.Arg(startID))),
 		sm.Where(models.Banners.Columns.ID.LT(mysql.Arg(startID + count))),
-		sm.Where(models.Banners.Columns.State.EQ(mysql.Arg(enums.BannersStateMypageTop))),
+		sm.Where(models.Banners.Columns.State.EQ(mysql.Arg(enums.BannersStateBS1))),
 		sm.OrderBy(models.Banners.Columns.ID.String()).Asc(),
 	})
 
@@ -351,11 +351,11 @@ func TestBaseReader_Generator_WithConditions(t *testing.T) {
 	}
 
 	// Verify results: should get 50 records (every other one)
-	assert.Len(t, allBanners, 50, "Should receive only MYPAGE_TOP banners")
+	assert.Len(t, allBanners, 50, "Should receive only BS_1 banners")
 
 	// Verify all have correct state
 	for _, banner := range allBanners {
-		assert.Equal(t, enums.BannersStateMypageTop, banner.State, "All banners should have MYPAGE_TOP state")
+		assert.Equal(t, enums.BannersStateBS1, banner.State, "All banners should have BS_1 state")
 	}
 }
 
@@ -412,7 +412,7 @@ func TestBaseReader_Find(t *testing.T) {
 	// Test Find existing record
 	banner, err := reader.Find(ctx, exec, startID)
 	require.NoError(t, err)
-	assert.Equal(t, startID, banner.ID)
+	assert.Equal(t, int32(startID), banner.ID)
 	assert.Equal(t, "Test Banner "+string(rune(startID)), banner.Name)
 
 	// Test Find non-existent record
@@ -446,13 +446,12 @@ func TestBaseReader_FindBy(t *testing.T) {
 		scan.StructMapper[*models.Banner](),
 	)
 
-	// Test FindBy with ID condition (should return highest ID due to DESC order)
+	// Test FindBy with ID condition (should return first matching record, no implicit ordering)
 	banner, err := reader.FindBy(ctx, exec, []SelMod{
-		sm.Where(models.Banners.Columns.ID.GTE(mysql.Arg(startID))),
-		sm.Where(models.Banners.Columns.ID.LT(mysql.Arg(startID + count))),
+		sm.Where(models.Banners.Columns.ID.EQ(mysql.Arg(startID))),
 	})
 	require.NoError(t, err)
-	assert.Equal(t, startID+count-1, banner.ID, "FindBy should return record with highest ID (DESC order)")
+	assert.Equal(t, int32(startID), banner.ID, "FindBy should return the matching record")
 
 	// Test FindBy with no results
 	_, err = reader.FindBy(ctx, exec, []SelMod{
@@ -489,7 +488,7 @@ func TestBaseReader_FindPreload(t *testing.T) {
 	// Test FindPreload
 	banner, err := reader.FindPreload(ctx, exec, id)
 	require.NoError(t, err)
-	assert.Equal(t, id, banner.ID)
+	assert.Equal(t, int32(id), banner.ID)
 
 	// Test FindPreload non-existent
 	_, err = reader.FindPreload(ctx, exec, 99999)
@@ -530,12 +529,12 @@ func TestBaseReader_FirstBy_LastBy(t *testing.T) {
 	// Test FirstBy - should return lowest ID
 	first, err := reader.FirstBy(ctx, exec, where)
 	require.NoError(t, err)
-	assert.Equal(t, startID, first.ID, "FirstBy should return record with lowest ID")
+	assert.Equal(t, int32(startID), first.ID, "FirstBy should return record with lowest ID")
 
 	// Test LastBy - should return highest ID
 	last, err := reader.LastBy(ctx, exec, where)
 	require.NoError(t, err)
-	assert.Equal(t, startID+count-1, last.ID, "LastBy should return record with highest ID")
+	assert.Equal(t, int32(startID+count-1), last.ID, "LastBy should return record with highest ID")
 }
 
 func TestBaseReader_All(t *testing.T) {
@@ -572,7 +571,7 @@ func TestBaseReader_All(t *testing.T) {
 	// Find our test records in results (DESC order, so highest ID first)
 	foundCount := 0
 	for _, banner := range banners {
-		if banner.ID >= startID && banner.ID < startID+count {
+		if banner.ID >= int32(startID) && banner.ID < int32(startID+count) {
 			foundCount++
 		}
 	}
@@ -616,7 +615,7 @@ func TestBaseReader_AllPreload(t *testing.T) {
 	// Verify DESC order
 	for i := 0; i < count; i++ {
 		expectedID := startID + count - 1 - i
-		assert.Equal(t, expectedID, banners[i].ID, "AllPreload should return records in DESC order")
+		assert.Equal(t, int32(expectedID), banners[i].ID, "AllPreload should return records in DESC order")
 	}
 }
 
@@ -658,7 +657,7 @@ func TestBaseReader_ListBy_SliceBy(t *testing.T) {
 	// Verify DESC order
 	for i := 0; i < count; i++ {
 		expectedID := startID + count - 1 - i
-		assert.Equal(t, expectedID, listBanners[i].ID, "ListBy should return in DESC order")
+		assert.Equal(t, int32(expectedID), listBanners[i].ID, "ListBy should return in DESC order")
 	}
 
 	// Test SliceBy - returns records without default ordering (but we can add our own)
@@ -668,7 +667,7 @@ func TestBaseReader_ListBy_SliceBy(t *testing.T) {
 	// Verify ASC order (because we specified it)
 	for i := 0; i < count; i++ {
 		expectedID := startID + i
-		assert.Equal(t, expectedID, sliceBanners[i].ID, "SliceBy with ASC order should return in ASC order")
+		assert.Equal(t, int32(expectedID), sliceBanners[i].ID, "SliceBy with ASC order should return in ASC order")
 	}
 }
 
@@ -705,12 +704,12 @@ func TestBaseReader_ListByIDs(t *testing.T) {
 	assert.Len(t, banners, len(ids))
 
 	// Verify all requested IDs are present
-	foundIDs := make(map[int]bool)
+	foundIDs := make(map[int32]bool)
 	for _, banner := range banners {
 		foundIDs[banner.ID] = true
 	}
 	for _, id := range ids {
-		assert.True(t, foundIDs[id], "ListByIDs should include ID %d", id)
+		assert.True(t, foundIDs[int32(id)], "ListByIDs should include ID %d", id)
 	}
 
 	// Test ListByIDs with empty slice

@@ -24,13 +24,15 @@ type (
 	DelMod = bob.Mod[*dialect.DeleteQuery]
 )
 
+// BaseSetter is a type alias for Bob ORM Setter with generic type constraints
 type BaseSetter[T any] = orm.Setter[T, *dialect.InsertQuery, *dialect.UpdateQuery]
 
-// BaseModel represents a Bob ORM generated model with Update and Delete methods
+// BaseModel represents a Bob ORM generated model with Update, Delete, and Reload methods
 // All Bob ORM models implement this interface
 type BaseModel[TSet any] interface {
 	Update(context.Context, bob.Executor, TSet) error
 	Delete(context.Context, bob.Executor) error
+	Reload(context.Context, bob.Executor) error
 }
 
 // BaseGenerator is used as channel result for streaming large datasets
@@ -59,8 +61,8 @@ func NewBaseRepo[T BaseModel[TSet], S ~[]T, TSet BaseSetter[T], C bob.Expression
 	db *sql.DB,
 	table *mysql.Table[T, S, TSet, C], // Bob ORM generated table (e.g., models.Banners)
 	idColumn mysql.Expression,
-	toSetter func(T) TSet,
 	mapper scan.Mapper[T], // Bob ORM generated mapper (e.g., models.BannerMapper())
+	infos any, // dbinfo table info (e.g., dbinfo.Banners)
 ) BaseRepo[T, S, TSet] {
 	// Create reader first
 	tableQuerier, ok := any(table).(TableQuerier[T, S])
@@ -80,8 +82,8 @@ func NewBaseRepo[T BaseModel[TSet], S ~[]T, TSet BaseSetter[T], C bob.Expression
 		db:       db,
 		table:    table,
 		idColumn: idColumn,
-		toSetter: toSetter,
 		reader:   reader,
+		infos:    infos,
 	}
 
 	return &baseRepo[T, S, TSet, C]{
