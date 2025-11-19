@@ -446,13 +446,12 @@ func TestBaseReader_FindBy(t *testing.T) {
 		scan.StructMapper[*models.Banner](),
 	)
 
-	// Test FindBy with ID condition (should return highest ID due to DESC order)
+	// Test FindBy with ID condition (should return first matching record, no implicit ordering)
 	banner, err := reader.FindBy(ctx, exec, []SelMod{
-		sm.Where(models.Banners.Columns.ID.GTE(mysql.Arg(startID))),
-		sm.Where(models.Banners.Columns.ID.LT(mysql.Arg(startID + count))),
+		sm.Where(models.Banners.Columns.ID.EQ(mysql.Arg(startID))),
 	})
 	require.NoError(t, err)
-	assert.Equal(t, startID+count-1, banner.ID, "FindBy should return record with highest ID (DESC order)")
+	assert.Equal(t, startID, banner.ID, "FindBy should return the matching record")
 
 	// Test FindBy with no results
 	_, err = reader.FindBy(ctx, exec, []SelMod{

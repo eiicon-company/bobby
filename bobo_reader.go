@@ -115,7 +115,6 @@ func (b *baseReader[T, S]) FindBy(ctx context.Context, tx bob.Executor, where []
 
 	mods := append([]SelMod{}, where...)
 	mods = append(mods, loads...)
-	mods = append(mods, sm.OrderBy(b.idColumn.String()).Desc())
 
 	r, err := b.table.Query(mods...).One(ctx, tx)
 	if err != nil {
