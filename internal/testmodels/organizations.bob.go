@@ -12,7 +12,7 @@ import (
 	"github.com/aarondl/opt/null"
 	"github.com/aarondl/opt/omit"
 	"github.com/aarondl/opt/omitnull"
-	enums "github.com/eiicon-company/bobo/internal/testenums"
+	enums "github.com/eiicon-company/bobby/internal/testenums"
 	"github.com/stephenafamo/bob"
 	"github.com/stephenafamo/bob/dialect/mysql"
 	"github.com/stephenafamo/bob/dialect/mysql/dialect"
@@ -26,17 +26,14 @@ import (
 
 // Organization is an object representing the database table.
 type Organization struct {
-	ID int32 `db:"id,pk,autoincr" `
-	// use as like slug
-	Identifier string `db:"identifier" `
-	// Which is used by it
-	Role enums.OrganizationsRole `db:"role" `
-	// Authenticated by administrator
-	IsAuthed  bool                `db:"is_authed" `
-	IsDeleted bool                `db:"is_deleted" `
-	DeletedAt null.Val[time.Time] `db:"deleted_at" `
-	CreatedAt time.Time           `db:"created_at" `
-	UpdatedAt time.Time           `db:"updated_at" `
+	ID         int32                   `db:"id,pk,autoincr" `
+	Identifier string                  `db:"identifier" `
+	Role       enums.OrganizationsRole `db:"role" `
+	IsAuthed   bool                    `db:"is_authed" `
+	IsDeleted  bool                    `db:"is_deleted" `
+	DeletedAt  null.Val[time.Time]     `db:"deleted_at" `
+	CreatedAt  time.Time               `db:"created_at" `
+	UpdatedAt  time.Time               `db:"updated_at" `
 
 	R organizationR `db:"-" `
 }

@@ -1,5 +1,5 @@
 mysql:
-  dsn: "root:@tcp(127.0.0.1:3306)/bobo_codegen?parseTime=true"
+  dsn: "root:@tcp(127.0.0.1:3306)/bobby_codegen?parseTime=true"
   concurrency: 10
 
 output: "internal/testmodels"

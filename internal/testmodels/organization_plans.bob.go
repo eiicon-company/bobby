@@ -12,7 +12,7 @@ import (
 	"github.com/aarondl/opt/null"
 	"github.com/aarondl/opt/omit"
 	"github.com/aarondl/opt/omitnull"
-	enums "github.com/eiicon-company/bobo/internal/testenums"
+	enums "github.com/eiicon-company/bobby/internal/testenums"
 	"github.com/stephenafamo/bob"
 	"github.com/stephenafamo/bob/dialect/mysql"
 	"github.com/stephenafamo/bob/dialect/mysql/dialect"
@@ -26,44 +26,27 @@ import (
 
 // OrganizationPlan is an object representing the database table.
 type OrganizationPlan struct {
-	ID             int32 `db:"id,pk,autoincr" `
-	OrganizationID int32 `db:"organization_id" `
-	// organization_plan_buyers id
-	OrganizationPlanBuyerID int32 `db:"organization_plan_buyer_id" `
-	// plan name
-	Plan enums.OrganizationPlansPlan `db:"plan" `
-	// payment method name
-	PaymentMethod enums.OrganizationPlansPaymentMethod `db:"payment_method" `
-	// use payment_method = "CREDIT" only
-	StripeCustomer string `db:"stripe_customer" `
-	// use payment_method = "CREDIT" only: subscription_id
-	StripeSubscription string `db:"stripe_subscription" `
-	// use payment_method = "CREDIT" only: charge_id
-	StripeCharge string `db:"stripe_charge" `
-	// use plan IN ("ENTRY", "BASIC", "UNLIMITED") only
-	UnsubscribedReason string `db:"unsubscribed_reason" `
-	// use plan IN ("ENTRY", "BASIC", "UNLIMITED") only
-	UnsubscribedRequestedAt null.Val[time.Time] `db:"unsubscribed_requested_at" `
-	// use plan IN ("ENTRY", "BASIC", "UNLIMITED") only
-	UnsubscribedActuallyAt null.Val[time.Time] `db:"unsubscribed_actually_at" `
-	// pending or not, this plan will be approved by admin
-	IsPending bool `db:"is_pending" `
-	// ENABLED=1 or DISABLED=null
-	IsEnabled null.Val[bool] `db:"is_enabled" `
-	// price at contract
-	ContractPrice int32 `db:"contract_price" `
-	// OldPlan=0|NewPlan=3
-	ContractVersion int32 `db:"contract_version" `
-	// Unit Day
-	ContractPeriod int32 `db:"contract_period" `
-	// the time when is punched out by extension of contract, which is extended contract"s timestamp
-	ContractUpdatedAt null.Val[time.Time] `db:"contract_updated_at" `
-	// the time when contract started
-	ContractStartedAt null.Val[time.Time] `db:"contract_started_at" `
-	// the time when contract is going to finish(expire)
-	ContractExpiredAt time.Time `db:"contract_expired_at" `
-	CreatedAt         time.Time `db:"created_at" `
-	UpdatedAt         time.Time `db:"updated_at" `
+	ID                      int32                                `db:"id,pk,autoincr" `
+	OrganizationID          int32                                `db:"organization_id" `
+	OrganizationPlanBuyerID int32                                `db:"organization_plan_buyer_id" `
+	Plan                    enums.OrganizationPlansPlan          `db:"plan" `
+	PaymentMethod           enums.OrganizationPlansPaymentMethod `db:"payment_method" `
+	StripeCustomer          string                               `db:"stripe_customer" `
+	StripeSubscription      string                               `db:"stripe_subscription" `
+	StripeCharge            string                               `db:"stripe_charge" `
+	UnsubscribedReason      string                               `db:"unsubscribed_reason" `
+	UnsubscribedRequestedAt null.Val[time.Time]                  `db:"unsubscribed_requested_at" `
+	UnsubscribedActuallyAt  null.Val[time.Time]                  `db:"unsubscribed_actually_at" `
+	IsPending               bool                                 `db:"is_pending" `
+	IsEnabled               null.Val[bool]                       `db:"is_enabled" `
+	ContractPrice           int32                                `db:"contract_price" `
+	ContractVersion         int32                                `db:"contract_version" `
+	ContractPeriod          int32                                `db:"contract_period" `
+	ContractUpdatedAt       null.Val[time.Time]                  `db:"contract_updated_at" `
+	ContractStartedAt       null.Val[time.Time]                  `db:"contract_started_at" `
+	ContractExpiredAt       time.Time                            `db:"contract_expired_at" `
+	CreatedAt               time.Time                            `db:"created_at" `
+	UpdatedAt               time.Time                            `db:"updated_at" `
 
 	R organizationPlanR `db:"-" `
 }

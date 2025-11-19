@@ -1,4 +1,4 @@
-package bobo
+package bobby
 
 import (
 	"context"
@@ -15,8 +15,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/xerrors"
 
-	enums "github.com/eiicon-company/bobo/internal/testenums"
-	models "github.com/eiicon-company/bobo/internal/testmodels"
+	enums "github.com/eiicon-company/bobby/internal/testenums"
+	models "github.com/eiicon-company/bobby/internal/testmodels"
 )
 
 // Test helper to clean up test data using Bob ORM

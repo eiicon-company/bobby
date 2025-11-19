@@ -1,4 +1,4 @@
-package bobo
+package bobby
 
 import (
 	"bytes"
@@ -18,7 +18,7 @@ import (
 	"github.com/eiicon-company/go-core/util/logger"
 	"github.com/eiicon-company/go-core/util/testdb"
 
-	"github.com/eiicon-company/bobo/internal/testenv"
+	"github.com/eiicon-company/bobby/internal/testenv"
 )
 
 var (
@@ -69,7 +69,7 @@ func getSchema(filename string) ([]byte, error) {
 }
 
 func TestMain(m *testing.M) {
-	dsn := fmt.Sprintf("mysql://%s", getenv("AUBA_API_DSN", "root:@tcp(127.0.0.1:3306)/bobo_test?parseTime=true"))
+	dsn := fmt.Sprintf("mysql://%s", getenv("AUBA_API_DSN", "root:@tcp(127.0.0.1:3306)/bobby_test?parseTime=true"))
 
 	// First try testdata/schema.sql, then fall back to modules/auba-dbmigration/schema.sql
 	schemaPath := "testdata/schema.sql"

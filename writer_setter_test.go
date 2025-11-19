@@ -1,4 +1,4 @@
-package bobo
+package bobby
 
 import (
 	"context"
@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	dbinfo "github.com/eiicon-company/bobo/internal/testdbinfo"
-	enums "github.com/eiicon-company/bobo/internal/testenums"
-	models "github.com/eiicon-company/bobo/internal/testmodels"
+	dbinfo "github.com/eiicon-company/bobby/internal/testdbinfo"
+	enums "github.com/eiicon-company/bobby/internal/testenums"
+	models "github.com/eiicon-company/bobby/internal/testmodels"
 )
 
 // Comprehensive tests for buildSetterForCreate and buildSetterForUpdate
