@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/eiicon-company/auba-api/pkg/data/model/bobmodel/dbinfo"
-	"github.com/eiicon-company/auba-api/pkg/data/model/bobmodel/enums"
-	"github.com/eiicon-company/auba-api/pkg/data/model/bobmodel/models"
+	dbinfo "github.com/eiicon-company/bobo/internal/testdbinfo"
+	enums "github.com/eiicon-company/bobo/internal/testenums"
+	models "github.com/eiicon-company/bobo/internal/testmodels"
 )
 
 // Comprehensive tests for buildSetterForCreate and buildSetterForUpdate
@@ -51,9 +51,9 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 		// Use a past timestamp to ensure DB default (CURRENT_TIMESTAMP) is different
 		pastTime := time.Now().UTC().Add(-1 * time.Hour)
 		banner := &models.Banner{
-			ID:        startID,
+			ID:        int32(startID),
 			Name:      "Test Banner 1",
-			State:     enums.BannersStateLoginTopLarge,
+			State:     enums.BannersStateBS2,
 			Sort:      1,
 			CreatedAt: pastTime, // Should be ignored, DB uses CURRENT_TIMESTAMP
 			UpdatedAt: pastTime, // Should be ignored, DB uses CURRENT_TIMESTAMP
@@ -79,10 +79,10 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 	})
 
 	// Test Case 2: State enum field with empty value should use DB default
-	// Expected: Empty string is skipped -> DB default "MYPAGE_TOP" is used
+	// Expected: Empty string is skipped -> DB default "BS_1" is used
 	t.Run("State_EmptyString_UsesDBDefault", func(t *testing.T) {
 		banner := &models.Banner{
-			ID:    startID + 1,
+			ID:    int32(startID + 1),
 			Name:  "Test Banner 2",
 			State: "", // Empty enum -> should use DB default
 			Sort:  2,
@@ -94,18 +94,18 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 		created, err := reader.Find(ctx, exec, startID+1)
 		require.NoError(t, err)
 
-		// Should use DB default "MYPAGE_TOP"
-		assert.Equal(t, enums.BannersStateMypageTop, created.State,
-			"Empty State should use DB default MYPAGE_TOP")
+		// Should use DB default "BS_1"
+		assert.Equal(t, enums.BannersStateBS1, created.State,
+			"Empty State should use DB default BS_1")
 	})
 
 	// Test Case 3: State enum field with value should be included
 	// Expected: Non-empty enum value is included in INSERT
 	t.Run("State_NonEmpty_Included", func(t *testing.T) {
 		banner := &models.Banner{
-			ID:    startID + 2,
+			ID:    int32(startID + 2),
 			Name:  "Test Banner 3",
-			State: enums.BannersStateLoginTopSmall,
+			State: enums.BannersStateBS3,
 			Sort:  3,
 		}
 
@@ -115,7 +115,7 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 		created, err := reader.Find(ctx, exec, startID+2)
 		require.NoError(t, err)
 
-		assert.Equal(t, enums.BannersStateLoginTopSmall, created.State,
+		assert.Equal(t, enums.BannersStateBS3, created.State,
 			"Non-empty State should be included")
 	})
 
@@ -124,9 +124,9 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 	// (Logic: Zero values are included for non-time fields)
 	t.Run("Sort_ZeroValue_Included", func(t *testing.T) {
 		banner := &models.Banner{
-			ID:    startID + 3,
+			ID:    int32(startID + 3),
 			Name:  "Test Banner 4",
-			State: enums.BannersStateMypageTop,
+			State: enums.BannersStateBS1,
 			Sort:  0, // Zero value with DB default
 		}
 
@@ -137,16 +137,16 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 		require.NoError(t, err)
 
 		// Sort=0 should be explicitly set, not from DB default
-		assert.Equal(t, 0, created.Sort, "Sort=0 should be included")
+		assert.Equal(t, int32(0), created.Sort, "Sort=0 should be included")
 	})
 
 	// Test Case 5: Sort int field with non-zero value should be INCLUDED
 	// Expected: Non-zero values are always included
 	t.Run("Sort_NonZeroValue_Included", func(t *testing.T) {
 		banner := &models.Banner{
-			ID:    startID + 4,
+			ID:    int32(startID + 4),
 			Name:  "Test Banner 5",
-			State: enums.BannersStateMypageTop,
+			State: enums.BannersStateBS1,
 			Sort:  999,
 		}
 
@@ -156,16 +156,16 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 		created, err := reader.Find(ctx, exec, startID+4)
 		require.NoError(t, err)
 
-		assert.Equal(t, 999, created.Sort, "Non-zero Sort should be included")
+		assert.Equal(t, int32(999), created.Sort, "Non-zero Sort should be included")
 	})
 
 	// Test Case 6: Name string field with empty value should be INCLUDED
 	// Expected: Empty string is included (no DB default, NOT a named string/enum)
 	t.Run("Name_EmptyString_Included", func(t *testing.T) {
 		banner := &models.Banner{
-			ID:    startID + 5,
+			ID:    int32(startID + 5),
 			Name:  "", // Empty plain string
-			State: enums.BannersStateMypageTop,
+			State: enums.BannersStateBS1,
 			Sort:  5,
 		}
 
@@ -182,9 +182,9 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 	// Expected: Non-empty strings are always included
 	t.Run("Name_NonEmpty_Included", func(t *testing.T) {
 		banner := &models.Banner{
-			ID:    startID + 6,
+			ID:    int32(startID + 6),
 			Name:  "Test Banner 7",
-			State: enums.BannersStateMypageTop,
+			State: enums.BannersStateBS1,
 			Sort:  6,
 		}
 
@@ -201,9 +201,9 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 	// Expected: All fields are included correctly
 	t.Run("AllFields_TypicalValues", func(t *testing.T) {
 		banner := &models.Banner{
-			ID:    startID + 7,
+			ID:    int32(startID + 7),
 			Name:  "Comprehensive Test Banner",
-			State: enums.BannersStateNologinTop,
+			State: enums.BannersStateBS4,
 			Sort:  777,
 		}
 
@@ -213,10 +213,10 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 		created, err := reader.Find(ctx, exec, startID+7)
 		require.NoError(t, err)
 
-		assert.Equal(t, startID+7, created.ID)
+		assert.Equal(t, int32(startID+7), created.ID)
 		assert.Equal(t, "Comprehensive Test Banner", created.Name)
-		assert.Equal(t, enums.BannersStateNologinTop, created.State)
-		assert.Equal(t, 777, created.Sort)
+		assert.Equal(t, enums.BannersStateBS4, created.State)
+		assert.Equal(t, int32(777), created.Sort)
 		assert.NotZero(t, created.CreatedAt)
 		assert.NotZero(t, created.UpdatedAt)
 	})
@@ -225,7 +225,7 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 	// This tests the interaction between buildSetterForCreate and DB defaults
 	t.Run("State_DBDefault_Integration", func(t *testing.T) {
 		banner := &models.Banner{
-			ID:    startID + 8,
+			ID:    int32(startID + 8),
 			Name:  "Default State Test",
 			State: "", // Should trigger DB default
 			Sort:  8,
@@ -237,10 +237,10 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 		created, err := reader.Find(ctx, exec, startID+8)
 		require.NoError(t, err)
 
-		// Verify dbinfo.Banners.Columns.State.Default is actually "MYPAGE_TOP"
-		assert.Equal(t, "MYPAGE_TOP", dbinfo.Banners.Columns.State.Default,
+		// Verify dbinfo.Banners.Columns.State.Default is actually "BS_1"
+		assert.Equal(t, "BS_1", dbinfo.Banners.Columns.State.Default,
 			"dbinfo should have correct default value")
-		assert.Equal(t, enums.BannersStateMypageTop, created.State,
+		assert.Equal(t, enums.BannersStateBS1, created.State,
 			"DB default should be applied")
 	})
 
@@ -249,9 +249,9 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 		// Note: Sort with zero value is INCLUDED in INSERT
 		// This is correct behavior: zero values are included for int fields
 		banner := &models.Banner{
-			ID:    startID + 9,
+			ID:    int32(startID + 9),
 			Name:  "Default Sort Test",
-			State: enums.BannersStateMypageTop,
+			State: enums.BannersStateBS1,
 			Sort:  0, // Will be explicitly set to 0
 		}
 
@@ -264,7 +264,7 @@ func TestBuildSetterForCreate_ComprehensiveCoverage(t *testing.T) {
 		// Verify dbinfo.Banners.Columns.Sort.Default
 		assert.Equal(t, "0", dbinfo.Banners.Columns.Sort.Default,
 			"dbinfo should have correct default value")
-		assert.Equal(t, 0, created.Sort,
+		assert.Equal(t, int32(0), created.Sort,
 			"Sort=0 should be explicitly set")
 	})
 }
@@ -299,10 +299,10 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 	// Helper to create initial banner
 	createBanner := func(id int, name string, state enums.BannersState, sort int) *models.Banner {
 		banner := &models.Banner{
-			ID:    id,
+			ID:    int32(id),
 			Name:  name,
 			State: state,
-			Sort:  sort,
+			Sort:  int32(sort),
 		}
 		err := writer.Create(ctx, exec, banner)
 		require.NoError(t, err)
@@ -312,7 +312,7 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 	// Test Case 1: CreatedAt should NOT be updated
 	// Expected: CreatedAt remains unchanged
 	t.Run("CreatedAt_NotUpdated", func(t *testing.T) {
-		original := createBanner(startID, "Original", enums.BannersStateMypageTop, 1)
+		original := createBanner(startID, "Original", enums.BannersStateBS1, 1)
 		originalCreatedAt := original.CreatedAt
 
 		time.Sleep(100 * time.Millisecond) // Ensure time difference
@@ -341,7 +341,7 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 	// NOTE: Due to OverwriteMerge + buildSetterForUpdate flow, UpdatedAt may or may not be set to current time
 	// depending on DB trigger behavior
 	t.Run("UpdatedAt_UpdatedByDB", func(t *testing.T) {
-		original := createBanner(startID+1, "Original 2", enums.BannersStateMypageTop, 2)
+		original := createBanner(startID+1, "Original 2", enums.BannersStateBS1, 2)
 		originalUpdatedAt := original.UpdatedAt
 
 		time.Sleep(100 * time.Millisecond) // Ensure time difference
@@ -368,7 +368,7 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 	// Expected: Empty State is skipped, original value remains
 	// NOTE: This is because buildSetterForUpdate skips empty enum values
 	t.Run("State_EmptyString_SkippedInUpdate", func(t *testing.T) {
-		original := createBanner(startID+2, "Original 3", enums.BannersStateLoginTopLarge, 3)
+		original := createBanner(startID+2, "Original 3", enums.BannersStateBS2, 3)
 		originalState := original.State
 
 		// Try to update State to empty (will be skipped)
@@ -392,7 +392,7 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 	// Test Case 4: Sort zero value should be INCLUDED in UPDATE
 	// Expected: Sort=0 is included (unlike CREATE, UPDATE includes zero values)
 	t.Run("Sort_ZeroValue_IncludedInUpdate", func(t *testing.T) {
-		original := createBanner(startID+3, "Original 4", enums.BannersStateMypageTop, 999)
+		original := createBanner(startID+3, "Original 4", enums.BannersStateBS1, 999)
 
 		// Update Sort to 0
 		original.Sort = 0
@@ -403,14 +403,14 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 		updated, err := reader.Find(ctx, exec, startID+3)
 		require.NoError(t, err)
 
-		assert.Equal(t, 0, updated.Sort,
+		assert.Equal(t, int32(0), updated.Sort,
 			"Sort=0 should be included in UPDATE")
 	})
 
 	// Test Case 5: Name empty string should be INCLUDED in UPDATE
 	// Expected: Empty Name is included
 	t.Run("Name_EmptyString_IncludedInUpdate", func(t *testing.T) {
-		original := createBanner(startID+4, "Original 5", enums.BannersStateMypageTop, 5)
+		original := createBanner(startID+4, "Original 5", enums.BannersStateBS1, 5)
 
 		// Update Name to empty
 		original.Name = ""
@@ -428,7 +428,7 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 	// Test Case 6: All fields can be updated (except CreatedAt)
 	// Expected: All fields are updated correctly
 	t.Run("AllFields_CanBeUpdated", func(t *testing.T) {
-		original := createBanner(startID+5, "Original 6", enums.BannersStateMypageTop, 6)
+		original := createBanner(startID+5, "Original 6", enums.BannersStateBS1, 6)
 		originalCreatedAt := original.CreatedAt
 		originalUpdatedAt := original.UpdatedAt
 
@@ -436,7 +436,7 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 
 		// Update all fields
 		original.Name = "Completely Updated"
-		original.State = enums.BannersStateBannerIndex
+		original.State = enums.BannersStateBS8
 		original.Sort = 123
 
 		err := writer.Update(ctx, exec, original)
@@ -447,8 +447,8 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 
 		// All fields should be updated (except CreatedAt)
 		assert.Equal(t, "Completely Updated", updated.Name)
-		assert.Equal(t, enums.BannersStateBannerIndex, updated.State)
-		assert.Equal(t, 123, updated.Sort)
+		assert.Equal(t, enums.BannersStateBS8, updated.State)
+		assert.Equal(t, int32(123), updated.Sort)
 		assert.Equal(t, originalCreatedAt.Unix(), updated.CreatedAt.Unix(),
 			"CreatedAt should not change")
 		// Log UpdatedAt for information (may or may not change depending on implementation)
@@ -459,7 +459,7 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 	// Test Case 7: Partial update (only some fields changed)
 	// Expected: Changed fields are updated, others remain same
 	t.Run("PartialUpdate_OnlyChangedFields", func(t *testing.T) {
-		original := createBanner(startID+6, "Original 7", enums.BannersStateLoginTopSmall, 7)
+		original := createBanner(startID+6, "Original 7", enums.BannersStateBS3, 7)
 		originalState := original.State
 		originalSort := original.Sort
 
@@ -484,7 +484,7 @@ func TestBuildSetterForUpdate_ComprehensiveCoverage(t *testing.T) {
 	// Test Case 8: Update twice to verify UpdatedAt changes
 	// Expected: UpdatedAt is updated on each call
 	t.Run("UpdateTwice_UpdatedAtChanges", func(t *testing.T) {
-		original := createBanner(startID+7, "Original 8", enums.BannersStateMypageTop, 8)
+		original := createBanner(startID+7, "Original 8", enums.BannersStateBS1, 8)
 
 		time.Sleep(100 * time.Millisecond)
 

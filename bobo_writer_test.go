@@ -14,8 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/eiicon-company/auba-api/pkg/data/model/bobmodel/enums"
-	"github.com/eiicon-company/auba-api/pkg/data/model/bobmodel/models"
+	enums "github.com/eiicon-company/bobo/internal/testenums"
+	models "github.com/eiicon-company/bobo/internal/testmodels"
 )
 
 // BaseWriter Method Tests
@@ -53,14 +53,14 @@ func TestBaseWriter_Create(t *testing.T) {
 	require.NoError(t, err, "Create should succeed")
 
 	// IMPORTANT: Verify that banner object itself was updated with DB values
-	assert.Equal(t, startID, banner.ID, "banner.ID should be set")
+	assert.Equal(t, int32(startID), banner.ID, "banner.ID should be set")
 	assert.NotZero(t, banner.CreatedAt, "banner.CreatedAt should be set")
 	assert.NotZero(t, banner.UpdatedAt, "banner.UpdatedAt should be set")
 
 	// Also verify by reading from DB (data consistency check)
 	created, err := reader.Find(ctx, exec, startID)
 	require.NoError(t, err)
-	assert.Equal(t, startID, created.ID)
+	assert.Equal(t, int32(startID), created.ID)
 	assert.Equal(t, banner.Name, created.Name)
 	// Verify banner object matches DB
 	assert.Equal(t, banner.CreatedAt.Unix(), created.CreatedAt.Unix(), "banner.CreatedAt should match DB")
@@ -74,7 +74,7 @@ func TestBaseWriter_Create(t *testing.T) {
 	// Verify second record
 	created2, err := reader.Find(ctx, exec, startID+1)
 	require.NoError(t, err)
-	assert.Equal(t, startID+1, created2.ID)
+	assert.Equal(t, int32(startID+1), created2.ID)
 
 	// Test Create duplicate ID (should fail due to primary key constraint)
 	duplicateBanner := createTestBanner(startID)
@@ -129,7 +129,7 @@ func TestBaseWriter_Update(t *testing.T) {
 
 	// IMPORTANT: Verify that updatedBanner object itself was updated with latest DB values
 	assert.Equal(t, "Updated Banner Name", updatedBanner.Name, "updatedBanner.Name should be updated")
-	assert.Equal(t, 999, updatedBanner.Sort, "updatedBanner.Sort should be updated")
+	assert.Equal(t, int32(999), updatedBanner.Sort, "updatedBanner.Sort should be updated")
 	// assert.True(t, updatedBanner.UpdatedAt.After(initialUpdatedAt), "updatedBanner.UpdatedAt should be newer (MySQL ON UPDATE CURRENT_TIMESTAMP)")
 	assert.NotZero(t, updatedBanner.CreatedAt, "updatedBanner.CreatedAt should be set")
 
@@ -137,7 +137,7 @@ func TestBaseWriter_Update(t *testing.T) {
 	updated, err := reader.Find(ctx, exec, startID)
 	require.NoError(t, err)
 	assert.Equal(t, "Updated Banner Name", updated.Name)
-	assert.Equal(t, 999, updated.Sort)
+	assert.Equal(t, int32(999), updated.Sort)
 	// Verify updatedBanner object matches DB
 	assert.Equal(t, updatedBanner.Name, updated.Name, "updatedBanner should match DB")
 	// Use Unix() comparison to avoid timezone/precision issues between Go and MySQL
@@ -236,14 +236,14 @@ func TestBaseWriter_Upsert(t *testing.T) {
 	require.NoError(t, err, "Upsert as insert should succeed")
 
 	// IMPORTANT: Verify that banner object itself was updated (INSERT case)
-	assert.Equal(t, startID, banner.ID, "banner.ID should be set after upsert insert")
+	assert.Equal(t, int32(startID), banner.ID, "banner.ID should be set after upsert insert")
 	assert.NotZero(t, banner.CreatedAt, "banner.CreatedAt should be set after upsert insert")
 	assert.NotZero(t, banner.UpdatedAt, "banner.UpdatedAt should be set after upsert insert")
 
 	// Also verify by reading from DB
 	created, err := reader.Find(ctx, exec, startID)
 	require.NoError(t, err)
-	assert.Equal(t, startID, created.ID)
+	assert.Equal(t, int32(startID), created.ID)
 	assert.Equal(t, banner.Name, created.Name)
 
 	// initialUpdatedAt := banner.UpdatedAt
@@ -257,14 +257,14 @@ func TestBaseWriter_Upsert(t *testing.T) {
 
 	// IMPORTANT: Verify that updatedBanner object itself was updated (UPDATE case)
 	assert.Equal(t, "Upserted Banner Name", updatedBanner.Name, "updatedBanner.Name should be updated after upsert update")
-	assert.Equal(t, 888, updatedBanner.Sort, "updatedBanner.Sort should be updated after upsert update")
+	assert.Equal(t, int32(888), updatedBanner.Sort, "updatedBanner.Sort should be updated after upsert update")
 	// assert.True(t, updatedBanner.UpdatedAt.After(initialUpdatedAt), "updatedBanner.UpdatedAt should be newer (MySQL ON UPDATE CURRENT_TIMESTAMP)")
 
 	// Also verify by reading from DB
 	updated, err := reader.Find(ctx, exec, startID)
 	require.NoError(t, err)
 	assert.Equal(t, "Upserted Banner Name", updated.Name)
-	assert.Equal(t, 888, updated.Sort)
+	assert.Equal(t, int32(888), updated.Sort)
 
 	// Test Upsert with ID=0 (should insert)
 	bannerZeroID := createTestBanner(0)
@@ -305,13 +305,13 @@ func TestBaseWriter_UpsertLegacy(t *testing.T) {
 	require.NoError(t, err, "UpsertLegacy as insert should succeed")
 
 	// IMPORTANT: Verify that banner object itself was updated (INSERT case)
-	assert.Equal(t, startID, banner.ID, "banner.ID should be set after upsertlegacy insert")
+	assert.Equal(t, int32(startID), banner.ID, "banner.ID should be set after upsertlegacy insert")
 	assert.NotZero(t, banner.CreatedAt, "banner.CreatedAt should be set after upsertlegacy insert")
 
 	// Also verify by reading from DB
 	created, err := reader.Find(ctx, exec, startID)
 	require.NoError(t, err)
-	assert.Equal(t, startID, created.ID)
+	assert.Equal(t, int32(startID), created.ID)
 
 	// initialUpdatedAt := banner.UpdatedAt
 
@@ -324,14 +324,14 @@ func TestBaseWriter_UpsertLegacy(t *testing.T) {
 
 	// IMPORTANT: Verify that updatedBanner object itself was updated (UPDATE case)
 	assert.Equal(t, "UpsertLegacy Updated Name", updatedBanner.Name, "updatedBanner.Name should be updated")
-	assert.Equal(t, 777, updatedBanner.Sort, "updatedBanner.Sort should be updated")
+	assert.Equal(t, int32(777), updatedBanner.Sort, "updatedBanner.Sort should be updated")
 	// assert.True(t, updatedBanner.UpdatedAt.After(initialUpdatedAt), "updatedBanner.UpdatedAt should be newer (MySQL ON UPDATE CURRENT_TIMESTAMP)")
 
 	// Also verify by reading from DB
 	updated, err := reader.Find(ctx, exec, startID)
 	require.NoError(t, err)
 	assert.Equal(t, "UpsertLegacy Updated Name", updated.Name)
-	assert.Equal(t, 777, updated.Sort)
+	assert.Equal(t, int32(777), updated.Sort)
 
 	// Test UpsertLegacy with ID=0 (should insert)
 	bannerZeroID := createTestBanner(0)
@@ -372,7 +372,7 @@ func TestBaseWriter_Create_Update_Delete_Sequence(t *testing.T) {
 	require.NoError(t, err, "Create should succeed")
 
 	// Step 2: Verify created record - both object and DB
-	assert.Equal(t, startID, banner.ID, "banner.ID should be set after create")
+	assert.Equal(t, int32(startID), banner.ID, "banner.ID should be set after create")
 	assert.NotZero(t, banner.CreatedAt, "banner.CreatedAt should be set after create")
 	created, err := reader.Find(ctx, exec, startID)
 	require.NoError(t, err)
@@ -468,7 +468,7 @@ func TestBaseWriter_Update_PreservesRelations(t *testing.T) {
 		updatedPlan, err := planRepo.Find(ctx, exec, planStartID)
 		require.NoError(t, err)
 		assert.Equal(t, false, updatedPlan.IsPending, "IsPending should be updated in DB")
-		assert.Equal(t, 12345, updatedPlan.ContractPrice, "ContractPrice should be updated in DB")
+		assert.Equal(t, int32(12345), updatedPlan.ContractPrice, "ContractPrice should be updated in DB")
 	})
 
 	// Test Case 2: Multiple updates should still preserve relations
@@ -564,7 +564,7 @@ func cleanupOrganizationPlanBuyers(t *testing.T, db *sql.DB, ids ...int) {
 // createTestOrganizationPlanWithBuyer creates a test OrganizationPlan with OrganizationPlanBuyer relation
 func createTestOrganizationPlanWithBuyer(planID, buyerID, organizationID int) *models.OrganizationPlan {
 	buyer := &models.OrganizationPlanBuyer{
-		ID:              buyerID,
+		ID:              int32(buyerID),
 		CompanyName:     "Test Company",
 		PhoneNumber:     "03-1234-5678",
 		Email:           "test@example.com",
@@ -583,11 +583,11 @@ func createTestOrganizationPlanWithBuyer(planID, buyerID, organizationID int) *m
 	}
 
 	plan := &models.OrganizationPlan{
-		ID:                      planID,
-		OrganizationID:          organizationID,
-		OrganizationPlanBuyerID: buyerID,
-		Plan:                    enums.OrganizationPlansPlanBasic,
-		PaymentMethod:           enums.OrganizationPlansPaymentMethodApplication,
+		ID:                      int32(planID),
+		OrganizationID:          int32(organizationID),
+		OrganizationPlanBuyerID: int32(buyerID),
+		Plan:                    enums.OrganizationPlansPlanPL3,
+		PaymentMethod:           enums.OrganizationPlansPaymentMethodPM2,
 		IsPending:               true,
 		IsEnabled:               null.From(false),
 		ContractPrice:           10000,

@@ -18,7 +18,7 @@ import (
 	"github.com/eiicon-company/go-core/util/logger"
 	"github.com/eiicon-company/go-core/util/testdb"
 
-	"github.com/eiicon-company/auba-api/pkg/environ"
+	"github.com/eiicon-company/bobo/internal/testenv"
 )
 
 var (
@@ -28,14 +28,15 @@ var (
 )
 
 type (
-	testEnv struct {
-		environ.Env
-	}
+	testEnv struct{}
 )
 
 func (e *testEnv) Tenant() (string, error) {
 	return "test", nil
 }
+
+// Ensure testEnv implements testenv.Env
+var _ testenv.Env = (*testEnv)(nil)
 
 func getenv(key, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok {
@@ -68,9 +69,15 @@ func getSchema(filename string) ([]byte, error) {
 }
 
 func TestMain(m *testing.M) {
-	dsn := fmt.Sprintf("mysql://%s", getenv("AUBA_API_DSN", "root:@tcp(127.0.0.1:3306)/auba_test?parseTime=true"))
+	dsn := fmt.Sprintf("mysql://%s", getenv("AUBA_API_DSN", "root:@tcp(127.0.0.1:3306)/bobo_test?parseTime=true"))
 
-	schema, err := getSchema(getenv("AUBA_API_DDL", "modules/auba-dbmigration/schema.sql"))
+	// First try testdata/schema.sql, then fall back to modules/auba-dbmigration/schema.sql
+	schemaPath := "testdata/schema.sql"
+	if _, err := os.Stat(schemaPath); os.IsNotExist(err) {
+		schemaPath = getenv("AUBA_API_DDL", "modules/auba-dbmigration/schema.sql")
+	}
+
+	schema, err := getSchema(schemaPath)
 	if err != nil {
 		logger.Printf("no dbMain tester: %+v", err)
 		os.Exit(1)
