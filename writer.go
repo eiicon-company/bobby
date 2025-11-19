@@ -1,5 +1,5 @@
-// Package bobo base writer implementation
-package bobo
+// Package bobby base writer implementation
+package bobby
 
 import (
 	"context"

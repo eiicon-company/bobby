@@ -1,5 +1,5 @@
-// Package bobo base reader implementation
-package bobo
+// Package bobby base reader implementation
+package bobby
 
 import (
 	"context"

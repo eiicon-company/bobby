@@ -1,5 +1,5 @@
-// Package bobo base type definitions and interfaces
-package bobo
+// Package bobby base type definitions and interfaces
+package bobby
 
 import (
 	"context"

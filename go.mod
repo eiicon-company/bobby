@@ -1,4 +1,4 @@
-module github.com/eiicon-company/bobo
+module github.com/eiicon-company/bobby
 
 go 1.25.0
 

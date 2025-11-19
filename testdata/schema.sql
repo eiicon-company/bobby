@@ -1,4 +1,4 @@
--- Minimal schema for bobo tests
+-- Minimal schema for bobby tests
 -- Only includes tables needed for testing
 -- Foreign keys are one-way only (from organization_plans to other tables) to avoid circular dependencies
 

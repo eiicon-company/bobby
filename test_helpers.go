@@ -1,4 +1,4 @@
-package bobo
+package bobby
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 	"github.com/stephenafamo/scan"
 	"go.uber.org/dig"
 
-	dbinfo "github.com/eiicon-company/bobo/internal/testdbinfo"
-	"github.com/eiicon-company/bobo/internal/testenv"
-	models "github.com/eiicon-company/bobo/internal/testmodels"
+	dbinfo "github.com/eiicon-company/bobby/internal/testdbinfo"
+	"github.com/eiicon-company/bobby/internal/testenv"
+	models "github.com/eiicon-company/bobby/internal/testmodels"
 )
 
 // Test repository interfaces and implementations

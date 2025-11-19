@@ -56,7 +56,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: bobo_test
+          MYSQL_DATABASE: bobby_test
         ports:
           - 3306:3306
         options: >-
@@ -86,15 +86,15 @@ jobs:
 
       - name: Setup test database
         run: |
-          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS bobo_test;"
-          mysql -h 127.0.0.1 -u root -proot bobo_test < testdata/schema.sql
+          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS bobby_test;"
+          mysql -h 127.0.0.1 -u root -proot bobby_test < testdata/schema.sql
 
       - name: Download dependencies
         run: go mod download
 
       - name: Run tests
         env:
-          AUBA_API_DSN: "root:root@tcp(127.0.0.1:3306)/bobo_test?parseTime=true"
+          AUBA_API_DSN: "root:root@tcp(127.0.0.1:3306)/bobby_test?parseTime=true"
         run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
       - name: Upload coverage

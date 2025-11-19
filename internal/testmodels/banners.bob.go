@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/aarondl/opt/omit"
-	enums "github.com/eiicon-company/bobo/internal/testenums"
+	enums "github.com/eiicon-company/bobby/internal/testenums"
 	"github.com/stephenafamo/bob"
 	"github.com/stephenafamo/bob/dialect/mysql"
 	"github.com/stephenafamo/bob/dialect/mysql/dialect"
@@ -21,9 +21,8 @@ import (
 
 // Banner is an object representing the database table.
 type Banner struct {
-	ID   int32  `db:"id,pk,autoincr" `
-	Name string `db:"name" `
-	// must be picked one
+	ID        int32              `db:"id,pk,autoincr" `
+	Name      string             `db:"name" `
 	State     enums.BannersState `db:"state" `
 	Sort      int32              `db:"sort" `
 	CreatedAt time.Time          `db:"created_at" `

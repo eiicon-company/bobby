@@ -23,35 +23,22 @@ import (
 
 // OrganizationPlanBuyer is an object representing the database table.
 type OrganizationPlanBuyer struct {
-	ID int32 `db:"id,pk,autoincr" `
-	// use in contract
-	CompanyName string `db:"company_name" `
-	// use in contract
-	PhoneNumber string `db:"phone_number" `
-	// use in contract
-	Email string `db:"email" `
-	// use in contract
-	Representative string `db:"representative" `
-	// use in contract
-	UserName string `db:"user_name" `
-	// use in contract
-	Postcode string `db:"postcode" `
-	// use in contract
-	Address1 string `db:"address1" `
-	// use in contract
-	Address2 string `db:"address2" `
-	// use in contract
-	InvoicePostcode string `db:"invoice_postcode" `
-	// use in contract
-	InvoiceAddress1 string `db:"invoice_address1" `
-	// use in contract
-	InvoiceAddress2 string `db:"invoice_address2" `
-	// use in contract
-	InvoiceUserName string `db:"invoice_user_name" `
-	// use in contract
-	InvoiceEmail string    `db:"invoice_email" `
-	CreatedAt    time.Time `db:"created_at" `
-	UpdatedAt    time.Time `db:"updated_at" `
+	ID              int32     `db:"id,pk,autoincr" `
+	CompanyName     string    `db:"company_name" `
+	PhoneNumber     string    `db:"phone_number" `
+	Email           string    `db:"email" `
+	Representative  string    `db:"representative" `
+	UserName        string    `db:"user_name" `
+	Postcode        string    `db:"postcode" `
+	Address1        string    `db:"address1" `
+	Address2        string    `db:"address2" `
+	InvoicePostcode string    `db:"invoice_postcode" `
+	InvoiceAddress1 string    `db:"invoice_address1" `
+	InvoiceAddress2 string    `db:"invoice_address2" `
+	InvoiceUserName string    `db:"invoice_user_name" `
+	InvoiceEmail    string    `db:"invoice_email" `
+	CreatedAt       time.Time `db:"created_at" `
+	UpdatedAt       time.Time `db:"updated_at" `
 
 	R organizationPlanBuyerR `db:"-" `
 }
