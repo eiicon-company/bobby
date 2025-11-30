@@ -25,13 +25,13 @@ import (
 
 type (
 	UserRepo interface {
-		bobby.BobbyRepo[*models.User, models.UserSlice, *models.UserSetter]
+		bobby.BaseRepo[*models.User, models.UserSlice, *models.UserSetter]
 		// Custom method for this repository
 		ListByState(context.Context, bob.Executor, string, ...bobby.SelMod) (models.UserSlice, error)
 	}
 
 	userRepo struct {
-		bobby.BobbyRepo[*models.User, models.UserSlice, *models.UserSetter]
+		bobby.BaseRepo[*models.User, models.UserSlice, *models.UserSetter]
 	}
 )
 
